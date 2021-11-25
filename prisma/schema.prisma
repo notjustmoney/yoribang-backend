@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  phoneNumber String @unique
+  nickname String
+  serialCode Int
+  isChief Boolean @default(false)
+  status UserStatus @default(ACTIVE)
+  role Role @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+  loginAt DateTime?
+}
+
+enum UserStatus {
+  ACTIVE
+  DEACTIVE
+  BANN
+}
+
+enum Role {
+  USER
+  ADMIN
+}

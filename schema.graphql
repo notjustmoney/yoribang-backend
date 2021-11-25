@@ -1,0 +1,294 @@
+scalar DateTime
+
+union Writer = User | AlleyShop
+
+enum CommentType {
+  RECIPE
+  COOK_DIRAY
+}
+
+enum AlleyShopItemType {
+  SIGNATURE
+  RECOMMENDED
+  GENERAL
+}
+
+enum ReviewType {
+  RECIPE
+  ALLEY_SHOP
+}
+
+enum RecipeCategoryType {
+  COUNTRY
+  FOOD
+  INGREDIENT
+}
+
+enum ChiefApplyState {
+  PENDING
+  REJECT
+  ACCEPT
+}
+
+enum ShopApplyState {
+  PENDING
+  REJECT
+  ACCEPT
+}
+
+input SendVerificationCodeInput {
+  phoneNumber: String!
+}
+
+input LoginInput {
+  phoneNumber: String!
+  verificationCode: String!
+}
+
+input Meta {
+  pagination: Pagination
+}
+
+input Pagination {
+  first: Int
+  size: Int
+}
+
+input RecipeDetailInput {
+  id: ID!
+  comment: FindCommentInput
+}
+
+input FindCommentInput {
+  type: CommentType
+  meta: Meta
+}
+
+interface Like {
+  count: Int!
+  self: Boolean!
+  user: Writer!
+}
+
+type User {
+  id: ID!
+  nickname: String!
+  phoneNumber: String!
+  avatar: File
+  isChief: Boolean!
+  chiefApplyState: ChiefApplyState
+  shopApplyState: ShopApplyState
+  locationInfo: [LocationInfo]!
+  shop: AlleyShopItem
+  followerCount: Int!
+  followers: [User!]!
+  followings: [User!]!
+  diaries: [CookDiary!]!
+  cookPlayground: [Post!]!
+  scrappedRecipe: [Recipe!]!
+  likePost: [Post!]!
+  recipes: [Recipe!]!
+  created: DateTime!
+  updated: DateTime
+  blocked: DateTime
+}
+
+type LocationInfo {
+  radius: Int!
+}
+
+type Comment {
+  id: ID!
+  type: CommentType!
+  writer: Writer!
+  content: String!
+  depth: Int!
+  like: CommentLike!
+  parent: Comment
+  childs: [Comment!]!
+  locationInfo: LocationInfo
+  created: DateTime!
+  updated: DateTime
+  blocked: DateTime
+}
+
+type CommentLike implements Like {
+  count: Int!
+  self: Boolean!
+  user: Writer!
+  comment: Comment!
+}
+
+type Review {
+  id: ID!
+  writer: User!
+  type: ReviewType!
+  content: String!
+  images: [String!]!
+  created: DateTime!
+  updated: DateTime
+  blocked: DateTime
+}
+
+type File {
+  id: ID!
+}
+
+type Recipe {
+  id: ID!
+  writer: User!
+  title: String!
+  food: String!
+  thumbnail: String!
+  difficulty: Int!
+  cookTime: Int!
+  serving: Int!
+  categories: [RecipeCategory!]!
+  description: String!
+  comments(type: CommentType!, meta: Meta): [Comment!]!
+  ingredients(meta: Meta): [RecipeIngredient!]!
+  steps: [RecipeStep!]!
+  isScrapped: Boolean!
+}
+
+type RecipeCategory {
+  id: ID!
+  name: String!
+  type: RecipeCategoryType
+  parent: RecipeCategory
+  childs: [RecipeCategory!]!
+  recipes: [Recipe!]!
+}
+
+type RecipeIngredient {
+  id: ID!
+  recipe: Recipe!
+  ingredient: Ingredient!
+  amount: Int
+  unit: IngredientUnit
+}
+
+type RecipeStep {
+  id: ID!
+  step: Int!
+  title: String!
+  description: String!
+  ingredients(meta: Meta): [RecipeIngredient!]!
+  attachments: [File!]!
+}
+
+type Ingredient {
+  id: ID!
+  name: String!
+  possibleUnits: [IngredientUnit!]!
+  categories: [IngredientCategory!]!
+}
+
+type IngredientUnit {
+  name: String!
+  ingredients: [Ingredient!]!
+}
+
+type IngredientCategory {
+  id: ID!
+  name: String!
+  parent: IngredientCategory
+  childs: [IngredientCategory!]!
+  ingredients: [Ingredient!]!
+}
+
+type CookDiaryLike implements Like {
+  count: Int!
+  self: Boolean!
+  user: User!
+  diary: CookDiary!
+}
+
+type CookDiaryTag {
+  id: ID!
+  name: String!
+  diaries: [CookDiary!]!
+}
+
+type CookDiary {
+  id: ID!
+  writer: User!
+  images: [File!]!
+  locationInfo: LocationInfo
+  title: String!
+  content: String!
+  like: CookDiaryLike!
+  comments(type: CommentType!, meta: Meta): [Comment!]!
+  tags: [CookDiaryTag!]!
+  attachedRecipe: Recipe
+  created: DateTime
+  updated: DateTime
+}
+
+type PostLike implements Like {
+  count: Int!
+  self: Boolean!
+  user: User!
+  post: Post!
+}
+
+type PostCategory {
+  id: ID!
+  name: String!
+  posts: [Post!]!
+}
+
+type Post {
+  id: ID!
+  writer: Writer!
+  title: String
+  content: String!
+  locationInfo: LocationInfo
+  like: Like!
+  comments(type: CommentType!, meta: Meta): [Comment!]!
+  attachments: [File!]!
+  attachedRecipe: Recipe
+  category: PostCategory!
+  created: DateTime
+  updated: DateTime
+}
+
+type AlleyShop {
+  id: ID!
+  locationInfo: LocationInfo!
+  roadAddress: String!
+  detailAddress: String!
+  name: String!
+  thumbnails: [File!]!
+  notice: String
+  introduction: String!
+  businessHours: String!
+  website: String!
+  phoneNumber: String!
+  items: [AlleyShopItemType!]!
+  news: [Post!]!
+  patronFeed: [Post!]!
+  reviews: [Review!]!
+  created: DateTime
+  updated: DateTime
+}
+
+type AlleyShopItem {
+  id: ID!
+  name: String!
+  price: Int!
+  type: AlleyShopItemType!
+  shop: AlleyShop!
+  description: String
+}
+
+type Query {
+  me: User!
+  userById(id: ID!): User!
+  recipeById(input: RecipeDetailInput): Recipe!
+}
+
+type Mutation {
+  sendVerificationCode(input: SendVerificationCodeInput): String
+  login(input: LoginInput): String!
+}
