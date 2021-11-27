@@ -7,6 +7,11 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum FileGroup {
+    AVATAR = "AVATAR",
+    RECIPE_THUMBNAIL = "RECIPE_THUMBNAIL"
+}
+
 export enum CommentType {
     RECIPE = "RECIPE",
     COOK_DIRAY = "COOK_DIRAY"
@@ -50,6 +55,38 @@ export class LoginInput {
     verificationCode: string;
 }
 
+export class FileUploadInput {
+    file: Upload;
+    group: FileGroup;
+}
+
+export class RecipeIngredientUploadInput {
+    ingredientId: string;
+    amount?: Nullable<number>;
+    unit?: Nullable<string>;
+}
+
+export class RecipeStepUploadInput {
+    title?: Nullable<string>;
+    step?: Nullable<number>;
+    video: string;
+    attachmentIds?: Nullable<string[]>;
+    ingredients?: Nullable<Nullable<RecipeIngredientUploadInput>[]>;
+    description?: Nullable<string>;
+}
+
+export class RecipeUploadInput {
+    thumbnailId: string;
+    title: string;
+    difficulty: number;
+    food: string;
+    categories?: Nullable<string[]>;
+    description: string;
+    cookTime: number;
+    serving: number;
+    steps: RecipeStepUploadInput[];
+}
+
 export class Meta {
     pagination?: Nullable<Pagination>;
 }
@@ -79,7 +116,7 @@ export class User {
     id: string;
     nickname: string;
     phoneNumber: string;
-    avatar?: Nullable<File>;
+    avatar?: Nullable<Attachment>;
     isChief: boolean;
     chiefApplyState?: Nullable<ChiefApplyState>;
     shopApplyState?: Nullable<ShopApplyState>;
@@ -93,9 +130,9 @@ export class User {
     scrappedRecipe: Recipe[];
     likePost: Post[];
     recipes: Recipe[];
-    created: DateTime;
-    updated?: Nullable<DateTime>;
-    blocked?: Nullable<DateTime>;
+    createdAt: DateTime;
+    updatedAt?: Nullable<DateTime>;
+    blockedAt?: Nullable<DateTime>;
 }
 
 export class LocationInfo {
@@ -112,9 +149,9 @@ export class Comment {
     parent?: Nullable<Comment>;
     childs: Comment[];
     locationInfo?: Nullable<LocationInfo>;
-    created: DateTime;
-    updated?: Nullable<DateTime>;
-    blocked?: Nullable<DateTime>;
+    createdAt: DateTime;
+    updatedAt?: Nullable<DateTime>;
+    blockedAt?: Nullable<DateTime>;
 }
 
 export class CommentLike implements Like {
@@ -130,13 +167,17 @@ export class Review {
     type: ReviewType;
     content: string;
     images: string[];
-    created: DateTime;
-    updated?: Nullable<DateTime>;
-    blocked?: Nullable<DateTime>;
+    createdAt: DateTime;
+    updatedAt?: Nullable<DateTime>;
+    blockedAt?: Nullable<DateTime>;
 }
 
-export class File {
+export class Attachment {
     id: string;
+    originalName?: Nullable<string>;
+    extension?: Nullable<string>;
+    group?: Nullable<string>;
+    url?: Nullable<string>;
 }
 
 export class Recipe {
@@ -144,11 +185,11 @@ export class Recipe {
     writer: User;
     title: string;
     food: string;
-    thumbnail: string;
+    thumbnail: Attachment;
     difficulty: number;
     cookTime: number;
     serving: number;
-    categories: RecipeCategory[];
+    categories?: Nullable<RecipeCategory[]>;
     description: string;
     comments: Comment[];
     ingredients: RecipeIngredient[];
@@ -179,7 +220,8 @@ export class RecipeStep {
     title: string;
     description: string;
     ingredients: RecipeIngredient[];
-    attachments: File[];
+    attachments: Attachment[];
+    video: Attachment;
 }
 
 export class Ingredient {
@@ -218,7 +260,7 @@ export class CookDiaryTag {
 export class CookDiary {
     id: string;
     writer: User;
-    images: File[];
+    images: Attachment[];
     locationInfo?: Nullable<LocationInfo>;
     title: string;
     content: string;
@@ -226,8 +268,8 @@ export class CookDiary {
     comments: Comment[];
     tags: CookDiaryTag[];
     attachedRecipe?: Nullable<Recipe>;
-    created?: Nullable<DateTime>;
-    updated?: Nullable<DateTime>;
+    createdAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
 }
 
 export class PostLike implements Like {
@@ -251,11 +293,11 @@ export class Post {
     locationInfo?: Nullable<LocationInfo>;
     like: Like;
     comments: Comment[];
-    attachments: File[];
+    attachments: Attachment[];
     attachedRecipe?: Nullable<Recipe>;
     category: PostCategory;
-    created?: Nullable<DateTime>;
-    updated?: Nullable<DateTime>;
+    createdAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
 }
 
 export class AlleyShop {
@@ -264,7 +306,7 @@ export class AlleyShop {
     roadAddress: string;
     detailAddress: string;
     name: string;
-    thumbnails: File[];
+    thumbnails: Attachment[];
     notice?: Nullable<string>;
     introduction: string;
     businessHours: string;
@@ -274,8 +316,8 @@ export class AlleyShop {
     news: Post[];
     patronFeed: Post[];
     reviews: Review[];
-    created?: Nullable<DateTime>;
-    updated?: Nullable<DateTime>;
+    createdAt?: Nullable<DateTime>;
+    updatedAt?: Nullable<DateTime>;
 }
 
 export class AlleyShopItem {
@@ -299,8 +341,13 @@ export abstract class IMutation {
     abstract sendVerificationCode(input?: Nullable<SendVerificationCodeInput>): Nullable<string> | Promise<Nullable<string>>;
 
     abstract login(input?: Nullable<LoginInput>): string | Promise<string>;
+
+    abstract uploadFile(file: Upload, group: FileGroup): Attachment | Promise<Attachment>;
+
+    abstract uploadRecipe(input: RecipeUploadInput): Recipe | Promise<Recipe>;
 }
 
 export type DateTime = any;
+export type Upload = any;
 export type Writer = User | AlleyShop;
 type Nullable<T> = T | null;

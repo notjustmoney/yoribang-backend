@@ -26,6 +26,7 @@ export class LoginService {
     }
     /* generate token */
     const token = await this.generateToken(user.id);
+    await this.deleteVerificationCode(phoneNumber);
     return token;
   }
 
@@ -81,5 +82,9 @@ export class LoginService {
     let count = await this.prisma.user.count({ where: { nickname } });
     /* TODO: Transaction handle */
     return count++;
+  }
+
+  private async deleteVerificationCode(phoneNumber: string) {
+    await this.cacheManager.del(`code:${phoneNumber}`);
   }
 }

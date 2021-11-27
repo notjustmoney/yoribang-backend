@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Args, Query } from '@nestjs/graphql';
+import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { User } from '@prisma/client';
 import { CurrentUser } from '../../../../../auth/decorator/current-user.decorator';
 import { JwtAuthGuard } from '../../../../../auth/guard/jwt-auth.guard';
@@ -18,5 +18,17 @@ export class UserResolver {
   @UseGuards(JwtAuthGuard)
   async me(@CurrentUser() user: User) {
     return user;
+  }
+
+  @ResolveField('avatar')
+  async findAvatar(@Parent() user: User) {
+    const { avatarId } = user;
+    return {
+      id: '1sdafhjsdhfjsakld',
+      path: 'file-path-example',
+      fileName: 'server-name',
+      originalName: 'real-name',
+      extension: 'jpg',
+    };
   }
 }

@@ -9,8 +9,10 @@ import { FirebaseConfigModule } from './config/firebase/configuration.module';
 import { AuthConfigModule } from './config/auth/configuration.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './module/user/user.module';
+import { RecipeModule } from './module/recipe/recipe.module';
+import { MulterModule } from '@nestjs/platform-express';
 
-const APP_MODULES = [AuthModule, UserModule];
+const APP_MODULES = [AuthModule, UserModule, RecipeModule];
 const CONFIG_MODULES = [FirebaseConfigModule, AuthConfigModule];
 
 @Module({
@@ -23,6 +25,9 @@ const CONFIG_MODULES = [FirebaseConfigModule, AuthConfigModule];
     }),
     FirebaseModule.forRoot({
       googleApplicationCredential: process.env.GOOGLE_APPLICATION_CREDENTIAL,
+    }),
+    MulterModule.register({
+      dest: '/uploads',
     }),
     ...APP_MODULES,
     ...CONFIG_MODULES,

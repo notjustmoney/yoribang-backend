@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
+import { StorageResolver } from './storage/presentation/http/graphql/attachment.resolver';
+import { AttachmentController } from './storage/presentation/http/rest/attachment.controller';
+import { LocalStorageSerivce } from './storage/service/local-storage.service';
 
 @Module({
-  providers: [PrismaService],
-  exports: [PrismaService],
+  providers: [PrismaService, LocalStorageSerivce, StorageResolver],
+  controllers: [AttachmentController],
+  exports: [PrismaService, LocalStorageSerivce, StorageResolver],
 })
 export class SharedModule {}
