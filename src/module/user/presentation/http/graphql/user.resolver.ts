@@ -23,12 +23,6 @@ export class UserResolver {
   @ResolveField('avatar')
   async findAvatar(@Parent() user: User) {
     const { avatarId } = user;
-    return {
-      id: '1sdafhjsdhfjsakld',
-      path: 'file-path-example',
-      fileName: 'server-name',
-      originalName: 'real-name',
-      extension: 'jpg',
-    };
+    return this.prisma.attachment.findUnique({ where: { id: avatarId } });
   }
 }

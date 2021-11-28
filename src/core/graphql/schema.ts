@@ -8,8 +8,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export enum FileGroup {
-    AVATAR = "AVATAR",
-    RECIPE_THUMBNAIL = "RECIPE_THUMBNAIL"
+    USER_AVATAR = "USER_AVATAR",
+    RECIPE_THUMBNAIL = "RECIPE_THUMBNAIL",
+    RECIPE_VIDEO = "RECIPE_VIDEO",
+    RECIPE_IMAGE = "RECIPE_IMAGE"
 }
 
 export enum CommentType {
@@ -28,7 +30,7 @@ export enum ReviewType {
     ALLEY_SHOP = "ALLEY_SHOP"
 }
 
-export enum RecipeCategoryType {
+export enum RecipeCategoryGroup {
     COUNTRY = "COUNTRY",
     FOOD = "FOOD",
     INGREDIENT = "INGREDIENT"
@@ -200,7 +202,7 @@ export class Recipe {
 export class RecipeCategory {
     id: string;
     name: string;
-    type?: Nullable<RecipeCategoryType>;
+    type?: Nullable<RecipeCategoryGroup>;
     parent?: Nullable<RecipeCategory>;
     childs: RecipeCategory[];
     recipes: Recipe[];
@@ -334,6 +336,8 @@ export abstract class IQuery {
 
     abstract userById(id: string): User | Promise<User>;
 
+    abstract attachmentById(id: string): Attachment | Promise<Attachment>;
+
     abstract recipeById(input?: Nullable<RecipeDetailInput>): Recipe | Promise<Recipe>;
 }
 
@@ -341,8 +345,6 @@ export abstract class IMutation {
     abstract sendVerificationCode(input?: Nullable<SendVerificationCodeInput>): Nullable<string> | Promise<Nullable<string>>;
 
     abstract login(input?: Nullable<LoginInput>): string | Promise<string>;
-
-    abstract uploadFile(file: Upload, group: FileGroup): Attachment | Promise<Attachment>;
 
     abstract uploadRecipe(input: RecipeUploadInput): Recipe | Promise<Recipe>;
 }

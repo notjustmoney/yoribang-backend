@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
-import { RecipeUploadInput } from '@core/graphql/schema';
-import { User } from '@prisma/client';
+import { FileGroup, RecipeUploadInput } from '@core/graphql/schema';
+import { Attachment, AttachmentGroup, User } from '@prisma/client';
 
 @Injectable()
 export class UploadRecipeService {
@@ -21,32 +21,22 @@ export class UploadRecipeService {
     } = input;
     const thumbnail = await this.prisma.attachment.findUnique({
       where: { id: thumbnailId },
+      include: { group: true },
     });
-    // if (
-    //   user.id === '6e2a7753-0f33-495f-b501-dffdbff3ca9c' ||
-    //   thumbnail.userId !== user.id
-    // ) {
-    //   throw new Error('forbidden resource access');
-    // }
+
+    this.verifyAttachmentOwner(thumbnail, user.id);
+    this.verifyAttachmentGroup(thumbnail, FileGroup.RECIPE_THUMBNAIL);
 
     return await this.prisma.recipe.create({
       data: {
-        thumbnail: {
-          connect: {
-            id: '6e2a7753-0f33-495f-b501-dffdbff3ca9c',
-          },
-        },
+        thumbnail: { connect: { id: thumbnailId } },
         title,
         food,
         difficulty,
         cookTime,
         serving,
         description,
-        writer: {
-          connect: {
-            id: user.id,
-          },
-        },
+        writer: { connect: { id: user.id } },
         steps: {
           createMany: {
             data: steps.map((item) => ({
@@ -58,5 +48,20 @@ export class UploadRecipeService {
         },
       },
     });
+  }
+
+  private verifyAttachmentOwner(attachment: Attachment, userId: string) {
+    if (attachment.uploaderId !== userId) {
+      throw new Error('forbidden resource access');
+    }
+  }
+
+  private verifyAttachmentGroup(
+    attachment: Attachment & { group: AttachmentGroup },
+    groupName: FileGroup,
+  ) {
+    if (attachment.group.name !== groupName) {
+      throw new Error('attachment group not matched');
+    }
   }
 }

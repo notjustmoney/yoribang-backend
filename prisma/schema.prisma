@@ -27,128 +27,129 @@ enum CommentType {
 }
 
 model User {
-  id String @id @default(uuid())
-  phoneNumber String @unique
-  avatarId String?
-  avatar Attachment? @relation(name: "UserAvatar", fields: [avatarId], references: [id])
-  nickname String
-  serialCode Int
-  isChief Boolean @default(false)
-  status UserStatus @default(ACTIVE)
-  role Role @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime? @updatedAt
-  deletedAt DateTime?
-  loginAt DateTime?
+  id          String      @id @default(uuid())
+  phoneNumber String      @unique
+  avatarId    String?
+  avatar      Attachment? @relation(name: "UserAvatar", fields: [avatarId], references: [id])
+  nickname    String
+  serialCode  Int
+  isChief     Boolean     @default(false)
+  status      UserStatus  @default(ACTIVE)
+  role        Role        @default(USER)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
+  deletedAt   DateTime?
+  loginAt     DateTime?
 
-  recipes Recipe[]
+  recipes     Recipe[]
   attachments Attachment[] @relation("UserAttachment")
-  comments Comment[]
+  comments    Comment[]
 
   @@unique([nickname, serialCode])
 }
 
 model Recipe {
-  id String @id @default(uuid())
-  writerId String
-  writer User @relation(fields: [writerId], references: [id])
+  id          String     @id @default(uuid())
+  writerId    String
+  writer      User       @relation(fields: [writerId], references: [id])
   thumbnailId String
-  thumbnail Attachment @relation(fields: [thumbnailId], references: [id])
-  title String
-  food String
-  difficulty Int
-  cookTime Int
-  serving Int
+  thumbnail   Attachment @relation(fields: [thumbnailId], references: [id])
+  title       String
+  food        String
+  difficulty  Int
+  cookTime    Int
+  serving     Int
   description String
 
-  categories RecipeCategory[]
-  comments RecipeComment[]
+  categories  RecipeCategory[]
+  comments    RecipeComment[]
   ingredients Ingredient[]
-  steps RecipeStep[]
+  steps       RecipeStep[]
 }
 
 model RecipeCategory {
-  id String @id @default(uuid())
-  groupId String
-  group RecipeCategoryGroup @relation(fields: [groupId], references: [id])
+  id       String              @id @default(uuid())
+  groupId  String
+  group    RecipeCategoryGroup @relation(fields: [groupId], references: [id])
   recipeId String
-  recipe Recipe @relation(fields: [recipeId], references: [id])
+  recipe   Recipe              @relation(fields: [recipeId], references: [id])
 }
 
 model RecipeCategoryGroup {
-  id String @id @default(uuid())
-  name String
-  code String
+  id         String           @id @default(uuid())
+  name       String
+  code       String
   categories RecipeCategory[]
 }
 
 model RecipeStep {
-  id String @id @default(uuid())
-  step Int
-  title String
+  id          String @id @default(uuid())
+  step        Int
+  title       String
   description String
 
   recipeId String
-  recipe Recipe @relation(fields: [recipeId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
 
   ingredients Ingredient[]
   attachments RecipeStepAttachment[]
 }
 
 model RecipeStepAttachment {
-  id String @id @default(uuid())
+  id           String     @id @default(uuid())
   attachmentId String
-  attachment Attachment @relation(fields: [attachmentId], references: [id])
-  stepId String
-  step RecipeStep @relation(fields: [stepId], references: [id])
+  attachment   Attachment @relation(fields: [attachmentId], references: [id])
+  stepId       String
+  step         RecipeStep @relation(fields: [stepId], references: [id])
 }
 
 model Ingredient {
-  id String @id @default(uuid())
-  name String
+  id            String               @id @default(uuid())
+  name          String
   possibleUnits IngredientUnit[]
-  categories IngredientCategory[]
+  categories    IngredientCategory[]
 
-  steps RecipeStep[]
+  steps   RecipeStep[]
   recipes Recipe[]
 }
 
 model IngredientUnit {
-  id String @id @default(uuid())
-  name String
+  id          String       @id @default(uuid())
+  name        String
   ingredients Ingredient[]
 }
 
 model IngredientCategory {
-  id String @id @default(uuid())
-  name String
+  id       String               @id @default(uuid())
+  name     String
   parentId String?
-  parent IngredientCategory? @relation("IngredientCategoryTree", fields: [parentId], references: [id])
-  childs IngredientCategory[] @relation("IngredientCategoryTree")
+  parent   IngredientCategory?  @relation("IngredientCategoryTree", fields: [parentId], references: [id])
+  childs   IngredientCategory[] @relation("IngredientCategoryTree")
 
   ingredients Ingredient[]
 }
 
 model Attachment {
-  id String @id @default(uuid())
-  path String
-  fileName String
+  id           String   @id @default(uuid())
+  path         String
+  fileName     String
   originalName String
-  extension String?
-  createdAt DateTime @default(now())
+  mimeType     String
+  extension    String?
+  createdAt    DateTime @default(now())
 
-  groupId String
-  group AttachmentGroup @relation(fields: [groupId], references: [id])
+  groupId    String
+  group      AttachmentGroup @relation(fields: [groupId], references: [id])
   uploaderId String
-  uploader User @relation("UserAttachment", fields: [uploaderId], references: [id])
+  uploader   User            @relation("UserAttachment", fields: [uploaderId], references: [id])
 
-  user User @relation(name: "UserAvatar")
-  recipes Recipe[]
+  recipes    Recipe[]
   recipeStep RecipeStepAttachment[]
+  User       User[]                 @relation("UserAvatar")
 }
 
 model AttachmentGroup {
-  id String @id @default(uuid())
+  id   String @id @default(uuid())
   name String
   code String
 
@@ -156,26 +157,26 @@ model AttachmentGroup {
 }
 
 model RecipeComment {
-  id String @id @default(uuid())
+  id        String  @id @default(uuid())
   commentId String
-  comment Comment @relation(fields: [commentId], references: [id])
-  recipeId String
-  recipe Recipe @relation(fields: [recipeId], references: [id])
+  comment   Comment @relation(fields: [commentId], references: [id])
+  recipeId  String
+  recipe    Recipe  @relation(fields: [recipeId], references: [id])
 }
 
 model Comment {
-  id String @id @default(uuid())
-  type CommentType
+  id       String      @id @default(uuid())
+  type     CommentType
   writerId String
-  writer User @relation(fields: [writerId], references: [id]) 
-  content String
+  writer   User        @relation(fields: [writerId], references: [id])
+  content  String
 
-  depth Int
+  depth    Int
   parentId String?
-  parent Comment? @relation("CommentTree", fields: [parentId], references: [id])
-  childs Comment[] @relation("CommentTree")
+  parent   Comment?  @relation("CommentTree", fields: [parentId], references: [id])
+  childs   Comment[] @relation("CommentTree")
 
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
 

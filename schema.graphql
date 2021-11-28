@@ -4,8 +4,10 @@ scalar Upload
 union Writer = User | AlleyShop
 
 enum FileGroup {
-  AVATAR
+  USER_AVATAR
   RECIPE_THUMBNAIL
+  RECIPE_VIDEO
+  RECIPE_IMAGE
 }
 
 enum CommentType {
@@ -24,7 +26,7 @@ enum ReviewType {
   ALLEY_SHOP
 }
 
-enum RecipeCategoryType {
+enum RecipeCategoryGroup {
   COUNTRY
   FOOD
   INGREDIENT
@@ -196,7 +198,7 @@ type Recipe {
 type RecipeCategory {
   id: ID!
   name: String!
-  type: RecipeCategoryType
+  type: RecipeCategoryGroup
   parent: RecipeCategory
   childs: [RecipeCategory!]!
   recipes: [Recipe!]!
@@ -328,12 +330,12 @@ type AlleyShopItem {
 type Query {
   me: User!
   userById(id: ID!): User!
+  attachmentById(id: ID!): Attachment!
   recipeById(input: RecipeDetailInput): Recipe!
 }
 
 type Mutation {
   sendVerificationCode(input: SendVerificationCodeInput): String
   login(input: LoginInput): String!
-  uploadFile(file: Upload!, group: FileGroup!): Attachment!
   uploadRecipe(input: RecipeUploadInput!): Recipe!
 }

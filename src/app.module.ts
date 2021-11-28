@@ -1,19 +1,27 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TwilioModule } from 'nestjs-twilio';
 import { FirebaseModule } from 'nestjs-firebase';
+import { AuthModule } from '@auth/auth.module';
 import { GqlConfigService } from '@config/graphql';
+import { StorageConfigModule } from '@config/storage/configuration.module';
+import { FirebaseConfigModule } from '@config/firebase/configuration.module';
+import { AuthConfigModule } from '@config/auth/configuration.module';
+import { ServeStaticConfigService } from '@config/serve-static/servce-static.options';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { FirebaseConfigModule } from './config/firebase/configuration.module';
-import { AuthConfigModule } from './config/auth/configuration.module';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './module/user/user.module';
-import { RecipeModule } from './module/recipe/recipe.module';
-import { MulterModule } from '@nestjs/platform-express';
+import { UserModule } from '@module/user/user.module';
+import { RecipeModule } from '@module/recipe/recipe.module';
+import { PrismaService } from './module/shared/prisma/prisma.service';
 
 const APP_MODULES = [AuthModule, UserModule, RecipeModule];
-const CONFIG_MODULES = [FirebaseConfigModule, AuthConfigModule];
+const CONFIG_MODULES = [
+  FirebaseConfigModule,
+  AuthConfigModule,
+  StorageConfigModule,
+];
 
 @Module({
   imports: [
@@ -28,6 +36,10 @@ const CONFIG_MODULES = [FirebaseConfigModule, AuthConfigModule];
     }),
     MulterModule.register({
       dest: '/uploads',
+    }),
+    ServeStaticModule.forRootAsync({
+      useClass: ServeStaticConfigService,
+      extraProviders: [PrismaService],
     }),
     ...APP_MODULES,
     ...CONFIG_MODULES,

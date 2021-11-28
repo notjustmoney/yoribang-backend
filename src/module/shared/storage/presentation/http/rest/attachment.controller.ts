@@ -1,49 +1,32 @@
-import { v4 as uuid } from 'uuid';
-import { extname } from 'path';
-import * as fs from 'fs';
-import { diskStorage } from 'multer';
 import {
+  Body,
   Controller,
   Post,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '@auth/guard/jwt-auth.guard';
 import { User } from '@prisma/client';
+import { CurrentUser } from '@auth/decorator/current-user.decorator';
+import { FileGroup } from '@core/graphql/schema';
 import { LocalStorageSerivce } from '../../../service/local-storage.service';
+import { LocalStorageInterceptor } from '../../../interceptor/local-storage.interceptor';
 
-@Controller('attachment')
+@Controller()
 export class AttachmentController {
   constructor(private readonly storageService: LocalStorageSerivce) {}
 
-  @Post()
+  @Post('attachment')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          const user = req.user as User;
-          if (!user) {
-            cb(new Error('Not authorized'), null);
-          }
-          const fileName = uuid();
-          const filePath = `uploads/${user.id}/${fileName}`;
-          if (!fs.existsSync(filePath)) {
-            fs.mkdirSync(filePath, { recursive: true });
-          }
-          req.body.fileName = fileName;
-          cb(null, filePath);
-        },
-      }),
-    }),
-  )
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  @LocalStorageInterceptor()
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('group') group: FileGroup,
+    @CurrentUser() user: User,
+  ) {
     if (!file) {
       throw new Error('no file');
     }
-
-    return file;
+    return this.storageService.uploadFileInformation(file, group, user.id);
   }
 }
