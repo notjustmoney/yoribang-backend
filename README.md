@@ -13,6 +13,14 @@
 
 ## Description
 
+### Using library & framework
+
+- Node.js v16.11.1
+- Nest.js v8.0.0
+- firebase-admin v10.0.0
+- prisma v3.5.0
+- @nestjs/graphql
+
 ### 시스템 구성도
 
 ![](./docs/system-diagram.png)
