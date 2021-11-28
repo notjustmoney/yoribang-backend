@@ -1,35 +1,63 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+## Table of Conents
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+- [Outline](#outline)
+- [Description](#description)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Running the app](#running-the-app)
+- [Stay in touch](#stay-in-touch)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Outline
+
+본 프로젝트는 2021년도 원티드에서 주최한 해,커리어 참여작입니다.
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 시스템 구성도
+
+![](./docs/system-diagram.png)
+
+### ERD
+
+![](./docs/erd.png)
+
+## Requirements
+
+- Database
+
+본 프로젝트는 [Prisma2](https://www.prisma.io/)를 사용합니다. 구체적인 데이터베이스의 제한사항은 없지만, 개발에는 MySQL을 활용하고 사용 중입니다.
+
+- Twilio
+
+문자 인증 서비스 구현을 위해 Twilio SDK를 활용합니다. 따라서 Twilio에서 발급 받은 번호와 Credential이 필요 합니다.
+
+- Firebase
+
+시스템의 전반적인 사용자 인증은 Firebase Auth 기반으로 구축되었습니다.
+
+- .env.example
+
+프로젝트를 실행하기 위해서는 위에서 언급한 데이터베이스, Firebase Admin Account Credential, Twilio Credential, 스토리지 정보 등을 .env 파일에 입력해야 합니다.
+
+```
+DATABASE_URL="mysql://<db-username>:<db-password>@localhost:3306/<db-name>?schema=public"
+
+GOOGLE_APPLICATION_CREDENTIAL="firebase-service-account.json"
+
+TWILIO_ACCOUNT_SID="<twilio-account-sid>"
+TWILIO_AUTH_TOKEN="<twilio-auth-token>"
+TWILIO_PHONE_NUMBER = '<twilio-phone-number>'
+
+STORAGE_PROTOCOL="http"
+STORAGE_HOST="localhost"
+STORAGE_PORT="3000"
+```
 
 ## Installation
 
 ```bash
 $ npm install
+$ npx prisma generate
 ```
 
 ## Running the app
@@ -45,29 +73,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+- Author - [Jaeyun Cha](https://notjustmoney.github.io)
